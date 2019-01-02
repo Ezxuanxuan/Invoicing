@@ -12,7 +12,7 @@ var (
 )
 
 func Init() {
-	db, err = gorm.Open("mysql", "root:@(127.0.0.1:3306)/Invoicing?charset=utf8&parseTime=True&loc=Local")
+	db, err = gorm.Open("mysql", "root:QQQQqqqq.1111@(127.0.0.1:3306)/Invoicing?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic("连接数据库失败")
 	}

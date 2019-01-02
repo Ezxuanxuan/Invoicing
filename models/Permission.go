@@ -6,7 +6,7 @@ import "github.com/jinzhu/gorm"
 type Permission struct {
 	gorm.Model
 	StaffId int    //StaffTable one-to-one
-	Context string `gorm:"char:11"` //"{LogPer,InOrderPer,OutOrderPer,PermissionPer,WarePer,ProductPer,DestroyPer,QualityPer,CarryPer,InWarePer,SalePer}"
+	Context string `gorm:"type:char(11)"` //"{LogPer,InOrderPer,OutOrderPer,PermissionPer,WarePer,ProductPer,DestroyPer,QualityPer,CarryPer,InWarePer,SalePer}"
 }
 
 //创建员工权限
