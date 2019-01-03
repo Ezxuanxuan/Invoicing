@@ -25,8 +25,10 @@ func Init() *echo.Echo {
 		v1.POST("/permission/getbystaff", api.GetPermissionByStaffId())
 
 		v1.POST("/component/create", api.CreateComponent())
-		v1.POST("/component/del", api.DelComponent())
+		v1.POST("/component/del", api.DelComponentById())
 		v1.POST("/component/all", api.GetAllComponent())
+		v1.POST("/component/get/id", api.GetComponentById())
+		v1.POST("/component/get/no", api.GetComponentByNo())
 
 	}
 	return e
