@@ -91,6 +91,7 @@ func GetPermissionById() echo.HandlerFunc {
 	}
 }
 
+//获取所有的权限信息
 func GetAllPermission() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		permissions, err := models.GetPermissions()
