@@ -34,6 +34,8 @@ type Out struct {
 	ComponentId int    //Component外键
 	Quantity    int    //数量
 	Status      int    //审核状态
+
+	Component Component
 }
 
 //16.单号对应备注表
@@ -41,13 +43,6 @@ type OrderNoExplain struct {
 	OrderNo   string `gorm:"type:varchar(25)"` //订单编号
 	OrderType int    //单号类型（0，1）
 	Tag       string //备注
-}
-
-//7.仓库表
-type Ware struct {
-	gorm.Model
-	ComponentId int
-	Quantity    int
 }
 
 //15.采购表

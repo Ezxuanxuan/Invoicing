@@ -9,6 +9,7 @@ type Component struct {
 	Name     string `gorm:"type:varchar(20)"` //零件名
 	Material string `gorm:"type:varchar(20)"` //材质
 	Quality  int    //单品质量
+
 }
 
 //返回所有零件信息
