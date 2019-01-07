@@ -1,15 +1,18 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"time"
+)
 
-//15.零件表
-type Component struct {
-	gorm.Model
-	No       string `gorm:"type:varchar(20)"` //零件编码
-	Name     string `gorm:"type:varchar(20)"` //零件名
-	Material string `gorm:"type:varchar(20)"` //材质
-	Quality  int    //单品质量
-
+type Components struct {
+	Id        int       `xorm:"not null pk autoincr INT(11)"`
+	CreatedAt time.Time `xorm:"TIMESTAMP"`
+	UpdatedAt time.Time `xorm:"TIMESTAMP"`
+	DeletedAt time.Time `xorm:"index TIMESTAMP"`
+	No        string    `xorm:"VARCHAR(30)"`
+	Name      string    `xorm:"VARCHAR(30)"`
+	Material  string    `xorm:"VARCHAR(30)"`
+	Quantity  int       `xorm:"INT(11)"`
 }
 
 //返回所有零件信息
