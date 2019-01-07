@@ -43,7 +43,6 @@ func GetIdbyUsername(username string) (int64, error) {
 	staff := new(Staffs)
 	_, err := engine.Where("english_name = ?", username).Get(staff)
 	return staff.Id, err
-
 }
 
 func IsExitName(Name string) (bool, error) {
@@ -75,7 +74,7 @@ func GetAllStaff() ([]Staffs, error) {
 }
 
 //查询该用户id是否存在
-func GetStaffById(id int64) (bool, error) {
+func IsExitStaffById(id int64) (bool, error) {
 	staff := new(Staffs)
 	has, err := engine.Where("id = ?", id).Exist(staff)
 	return has, err

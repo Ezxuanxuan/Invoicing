@@ -46,9 +46,22 @@ func Login() echo.HandlerFunc {
 		}
 		//加密并返回给前端
 		IdValue := cookie.EncryptionId(userId)
+		permission, err := models.GetPermissionByStaff(userId)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		revalue := reValue{
+			Id:         IdValue,
+			Permission: permission,
+		}
 
-		return sendSuccess(1, IdValue, "账号密码校验成功", c)
+		return sendSuccess(1, revalue, "账号密码校验成功", c)
 	}
+}
+
+type reValue struct {
+	Id         string
+	Permission string
 }
 
 //注册用户
@@ -120,6 +133,9 @@ func CreateStaff() echo.HandlerFunc {
 			return sendError(errors.DO_ERROR, c)
 		}
 		//successful := &errors.Successful{1, "添加用户成功"}
+
+		id, _ := models.GetIdbyUsername(Name)
+		models.InitPermission(id)
 		return sendSuccess(1, "", "添加用户成功", c)
 	}
 }
@@ -142,7 +158,7 @@ func ModifyPassword() echo.HandlerFunc {
 		id := cookie.DecryptId(UserId)
 
 		//校验id是否存在
-		has, err := models.GetStaffById(id)
+		has, err := models.IsExitStaffById(id)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -172,7 +188,7 @@ func UpdateTelephone() echo.HandlerFunc {
 		id := cookie.DecryptId(UserId)
 
 		//校验id是否存在
-		has, err := models.GetStaffById(id)
+		has, err := models.IsExitStaffById(id)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}

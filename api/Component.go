@@ -13,11 +13,11 @@ import (
 
 func CreateComponent() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		No := c.Param("no")
-		Name := c.Param("name")
-		Material := c.Param("material")
-		Quality := c.Param("quality")
-		Quantity := c.Param("quantity")
+		No := c.FormValue("no")
+		Name := c.FormValue("name")
+		Material := c.FormValue("material")
+		Quality := c.FormValue("quality")
+		Quantity := c.FormValue("quantity")
 
 		if No == "" {
 			return sendError(errors.COMPONENT_NO_ERROR, c)
@@ -57,8 +57,8 @@ func CreateComponent() echo.HandlerFunc {
 			Quantity: quantity,
 		}
 
-		affected, err := models.CreateComponent(component)
-		if err != nil || affected < 1 {
+		_, err = models.CreateComponent(component)
+		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "添加零件信息成功", c)
@@ -67,7 +67,7 @@ func CreateComponent() echo.HandlerFunc {
 
 func GetComponentById() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		Id := c.Param("id")
+		Id := c.FormValue("id")
 
 		id, err := strconv.Atoi(Id)
 		if err != nil {
@@ -84,7 +84,7 @@ func GetComponentById() echo.HandlerFunc {
 
 func GetComponentByNo() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		No := c.Param("no")
+		No := c.FormValue("no")
 		if No == "" {
 			return sendError(errors.COMPONENT_NO_ERROR, c)
 		}
@@ -108,7 +108,7 @@ func GetAllComponent() echo.HandlerFunc {
 
 func DelComponentById() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		Id := c.Param("id")
+		Id := c.FormValue("id")
 
 		id, err := strconv.Atoi(Id)
 		if err != nil {

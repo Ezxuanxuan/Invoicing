@@ -11,7 +11,7 @@ type Successful struct {
 }
 
 var (
-	DO_ERROR                 = &Restful{-1000, "操作失败"}
+	DO_ERROR                 = &Restful{-1000, "数据库操作失败"}
 	USER_NOT_EXI             = &Restful{-1001, "用户名不存在"}
 	INPUT_USER_ERROR         = &Restful{-1002, "输入用户不合法"}
 	PASS_ERROR               = &Restful{-1003, "密码错误"}
@@ -22,6 +22,8 @@ var (
 	PHONE_ERROR              = &Restful{-1007, "电话号码非法"}
 	STAFF_ID_ERROR           = &Restful{-1008, "staff_id 非法"}
 	POWER_INPUT_ERROR        = &Restful{-1009, "权限类型输入错误"}
+	POWER_EXIST_FOR_USER     = &Restful{-1016, "该用户已有权限"}
+	POWER_NOT_EXIST_FOR_USER = &Restful{-1017, "该用户没有创建权限"}
 	INPUT_ERROR              = &Restful{-1010, "输入非法"}
 	COMPONENT_NO_ERROR       = &Restful{-1011, "零件编码不能为空"}
 	COMPONENT_NAME_ERROR     = &Restful{-1012, "零件名不能为空"}
