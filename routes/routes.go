@@ -30,8 +30,6 @@ func Init() *echo.Echo {
 		v1.POST("/component/all", api.GetAllComponent())
 		v1.POST("/component/get/id", api.GetComponentById())
 		v1.POST("/component/get/no", api.GetComponentByNo())
-
-		v1.POST("/ware/all", api.GetAllWare())
 	}
 	return e
 }

@@ -17,6 +17,7 @@ func CreateComponent() echo.HandlerFunc {
 		Name := c.Param("name")
 		Material := c.Param("material")
 		Quality := c.Param("quality")
+		Quantity := c.Param("quantity")
 
 		if No == "" {
 			return sendError(errors.COMPONENT_NO_ERROR, c)
@@ -33,6 +34,12 @@ func CreateComponent() echo.HandlerFunc {
 			return sendError(errors.COMPONENT_QUALITY_ERROR, c)
 		}
 
+		//将数量 转为int类型
+		quantity, err := strconv.Atoi(Quantity)
+		if err != nil {
+			return sendError(errors.COMPONENT_QUALITY_ERROR, c)
+		}
+
 		//查询零件编号是否存在
 		isexsit, err := models.IsExsitComponentNo(No)
 		if err != nil {
@@ -42,14 +49,16 @@ func CreateComponent() echo.HandlerFunc {
 			return sendError(errors.COMPONENT_NO_EXSIT, c)
 		}
 
-		component := models.Component{
+		component := models.Components{
 			No:       No,
 			Name:     Name,
 			Material: Material,
 			Quality:  quality,
+			Quantity: quantity,
 		}
 
-		if !models.CreateComponent(component) {
+		affected, err := models.CreateComponent(component)
+		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "添加零件信息成功", c)
@@ -106,7 +115,8 @@ func DelComponentById() echo.HandlerFunc {
 			return sendError(errors.INPUT_ERROR, c)
 		}
 
-		if !models.DelComponentById(id) {
+		affected, err := models.DelComponentById(id)
+		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "删除零件信息成功", c)

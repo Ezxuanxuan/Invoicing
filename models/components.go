@@ -6,19 +6,20 @@ import (
 
 type Components struct {
 	Id        int       `xorm:"not null pk autoincr INT(11)"`
-	CreatedAt time.Time `xorm:"TIMESTAMP"`
-	UpdatedAt time.Time `xorm:"TIMESTAMP"`
+	CreatedAt time.Time `xorm:"created"`
+	UpdatedAt time.Time `xorm:"updated"`
 	DeletedAt time.Time `xorm:"index TIMESTAMP"`
 	No        string    `xorm:"VARCHAR(30)"`
 	Name      string    `xorm:"VARCHAR(30)"`
 	Material  string    `xorm:"VARCHAR(30)"`
-	Quantity  int       `xorm:"INT(11)"`
+	Quality   int       `xorm:"INT(11)"` //质量
+	Quantity  int       `xorm:"INT(11)"` //数量
 }
 
 //返回所有零件信息
-func GetAllComponent() ([]Component, error) {
-	var components []Component
-	err := db.Select(&components).Error
+func GetAllComponent() ([]Components, error) {
+	components := make([]Components, 0)
+	err := engine.Find(&components)
 	if err != nil {
 		return nil, err
 	}
@@ -26,53 +27,41 @@ func GetAllComponent() ([]Component, error) {
 }
 
 //根据零件id返回零件信息
-func GetComponentById(id int) (Component, error) {
-	var component Component
-	err := db.Where("id = ?", id).Select(&component).Error
+func GetComponentById(id int) (Components, error) {
+	component := new(Components)
+	_, err := engine.Where("id = ?", id).Get(&component)
 	if err != nil {
-		return Component{}, err
+		return Components{}, err
 	}
-	return component, nil
+	return *component, nil
 }
 
 //根据零件编号返回零件
-func GetComponentByNo(No string) (Component, error) {
-	var component Component
-	err := db.Where("No = ?", No).Select(&component).Error
+func GetComponentByNo(no string) (Components, error) {
+	component := new(Components)
+	_, err := engine.Where("no = ?", no).Get(&component)
 	if err != nil {
-		return Component{}, err
+		return Components{}, err
 	}
-	return component, nil
+	return *component, nil
 }
 
 //添加零件
-func CreateComponent(component Component) bool {
-	err := db.Create(&component).Error
-	if err != nil {
-		return false
-	}
-	return true
+func CreateComponent(component Components) (int64, error) {
+	affected, err := engine.InsertOne(&component)
+	return affected, err
 }
 
 //是否存在该零件编号
 func IsExsitComponentNo(no string) (bool, error) {
-	count := 0
-	err := db.Model(&Component{}).Where("no = ?", no).Count(&count).Error
-	if err != nil {
-		return false, err
-	}
-	if count > 0 {
-		return true, nil
-	}
-	return false, nil
+	component := new(Components)
+	has, err := engine.Where("no = ?", no).Exist(&component)
+	return has, err
 }
 
 //通过id删除该零件信息
-func DelComponentById(id int) bool {
-	var component Component
-	err := db.Where("id = ?", id).Delete(&component).Error
-	if err != nil {
-		return false
-	}
-	return true
+func DelComponentById(id int) (int64, error) {
+	component := new(Components)
+	affected, err := engine.Where("id = ?", id).Delete(&component)
+	return affected, err
 }
