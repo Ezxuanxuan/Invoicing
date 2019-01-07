@@ -22,17 +22,28 @@ func Login() echo.HandlerFunc {
 			return sendError(errors.INPUT_USER_ERROR, c)
 		}
 
+		total, err := models.GetUserCountbyUsername(username)
 		//不存在该用户
-		if models.GetUserCountbyUsername(username) < 1 {
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if total < 1 {
 			return sendError(errors.USER_NOT_EXI, c)
 		}
-		pass := models.GetPasswordbyUsername(username)
+
+		pass, err := models.GetPasswordbyUsername(username)
 		//密码不正确
+		if err != nil {
+			return err
+		}
 		if pass != psswd {
 			return sendError(errors.PASS_ERROR, c)
 		}
 		//获取用户id
-		userId := models.GetIdbyUsername(username)
+		userId, err := models.GetIdbyUsername(username)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
 		//加密并返回给前端
 		IdValue := cookie.EncryptionId(userId)
 
@@ -62,11 +73,21 @@ func CreateStaff() echo.HandlerFunc {
 			return sendError(errors.IDCARD_ERROR, c)
 		}
 
-		if models.IsExitName(Name) {
+		//判断姓名是否存在
+		has, err := models.IsExitName(Name)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if has {
 			return sendError(errors.NAME_ERROR, c)
 		}
 
-		if models.IsExitEnglishName(EnglishName) {
+		//p判断英文名是否存在
+		has2, err := models.IsExitEnglishName(Name)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if has2 {
 			return sendError(errors.ENGLISH_ERROR, c)
 		}
 
@@ -85,7 +106,7 @@ func CreateStaff() echo.HandlerFunc {
 		//MD5加密
 		password := cookie.MD5(Password)
 
-		staff := models.Staff{
+		staff := models.Staffs{
 			Name:        Name,
 			EnglishName: EnglishName,
 			Password:    password,
@@ -93,7 +114,9 @@ func CreateStaff() echo.HandlerFunc {
 			IdCard:      IdCard,
 			Telephone:   Telephone,
 		}
-		if !models.CreateUser(staff) {
+
+		affected, err := models.CreateUser(staff)
+		if err != nil || affected != 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
 		//successful := &errors.Successful{1, "添加用户成功"}
@@ -103,7 +126,10 @@ func CreateStaff() echo.HandlerFunc {
 
 func GetAllStaff() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		staffs := models.GetAllStaff()
+		staffs, err := models.GetAllStaff()
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
 		return sendSuccess(1, staffs, "所有staff信息", c)
 	}
 }
@@ -116,16 +142,21 @@ func ModifyPassword() echo.HandlerFunc {
 		id := cookie.DecryptId(UserId)
 
 		//校验id是否存在
-		if !models.GetStaffById(id) {
+		has, err := models.GetStaffById(id)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if !has {
 			return sendError(errors.USER_NOT_EXI, c)
 		}
 
 		if Password == "" {
 			return sendError(errors.PASS_ERROR, c)
 		}
+
 		password := cookie.MD5(Password)
-		res := models.UpdatePassword(id, password)
-		if !res {
+		affected, err := models.UpdatePassword(id, password)
+		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "更新密码成功", c)
@@ -141,7 +172,11 @@ func UpdateTelephone() echo.HandlerFunc {
 		id := cookie.DecryptId(UserId)
 
 		//校验id是否存在
-		if !models.GetStaffById(id) {
+		has, err := models.GetStaffById(id)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if !has {
 			return sendError(errors.USER_NOT_EXI, c)
 		}
 
@@ -149,8 +184,8 @@ func UpdateTelephone() echo.HandlerFunc {
 		if !isAllNumic(Telephone) || Telephone == "" {
 			return sendError(errors.PHONE_ERROR, c)
 		}
-		res := models.UpdateTelephone(id, Telephone)
-		if !res {
+		affected, err := models.UpdateTelephone(id, Telephone)
+		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "更新电话号码成功", c)

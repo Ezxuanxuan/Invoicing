@@ -10,14 +10,14 @@ import (
 const key = ":djasgDAGHH_ji1283"
 
 //加密
-func EncryptionId(id int) string {
-	return strconv.Itoa(id) + key
+func EncryptionId(id int64) string {
+	return strconv.FormatInt(id, 10) + key
 }
 
 //解密
-func DecryptId(idValue string) int {
+func DecryptId(idValue string) int64 {
 	ss := strings.Split(idValue, ":")
-	id, err := strconv.Atoi(ss[0])
+	id, err := strconv.ParseInt(ss[0], 10, 64)
 	if err != nil {
 		return -1
 	}

@@ -23,9 +23,9 @@ func CreatePermission() echo.HandlerFunc {
 			return sendError(errors.POWER_INPUT_ERROR, c)
 		}
 
-		permission := models.Permission{StaffId: staff_id, Context: Context}
-
-		if !models.CreatePermission(permission) {
+		permission := models.Permissions{StaffId: staff_id, Context: Context}
+		affected, err := models.CreatePermission(permission)
+		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "创建权限成功", c)
@@ -47,9 +47,9 @@ func UpdatePermission() echo.HandlerFunc {
 			return sendError(errors.POWER_INPUT_ERROR, c)
 		}
 
-		permission := models.Permission{StaffId: staff_id, Context: Context}
-
-		if !models.UpdatePermission(permission) {
+		permission := models.Permissions{StaffId: staff_id, Context: Context}
+		affected, err := models.UpdatePermission(permission)
+		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "更新权限成功", c)
@@ -78,7 +78,7 @@ func GetPermissionByStaffId() echo.HandlerFunc {
 func GetPermissionById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		Id := c.Param("id")
-		id, err := strconv.Atoi(Id)
+		id, err := strconv.ParseInt(Id, 10, 64)
 		if err != nil {
 			return sendError(errors.INPUT_ERROR, c)
 		}

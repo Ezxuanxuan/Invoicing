@@ -3,12 +3,13 @@ package routes
 import (
 	"github.com/Invoicing/api"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func Init() *echo.Echo {
 
 	e := echo.New()
-
+	e.Use(middleware.CORS())
 	// Routes
 	v1 := e.Group("/api/v1")
 	{
