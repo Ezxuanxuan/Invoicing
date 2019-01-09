@@ -10,7 +10,7 @@ type Permissions struct {
 	UpdatedAt time.Time `xorm:"updated"`
 	DeletedAt time.Time `xorm:"index TIMESTAMP"`
 	StaffId   int64     `xorm:"INT(11)"`
-	Context   string    `xorm:"CHAR(11)"`
+	Context   string    `xorm:"CHAR(11)"` //LogPer,InOrderPer,OutOrderPer,PermissionPer,WarePer,ProductPer,DestroyPer,QualityPer,CarryPer,InWarePer,SalePer
 }
 
 //创建员工权限
@@ -24,8 +24,7 @@ func InitPermission(staff_id int64) (int64, error) {
 	permission := new(Permissions)
 	permission.StaffId = staff_id
 	permission.Context = "00000000000"
-	affeced, err := engine.Insert(&permission)
-	return affeced, err
+	return engine.Insert(permission)
 }
 
 //更新员工权限

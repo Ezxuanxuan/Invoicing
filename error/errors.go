@@ -30,4 +30,8 @@ var (
 	COMPONENT_MATERIAL_ERROR = &Restful{-1013, "零件材质输入不合法"}
 	COMPONENT_QUALITY_ERROR  = &Restful{-1014, "零件质量输入不合法"}
 	COMPONENT_NO_EXSIT       = &Restful{-1015, "零件编号已经存在"}
+	Order_NOT_EXIST          = &Restful{-1018, "该单号不存在"}
+	TAG_ERROR                = &Restful{-1019, "备注输入错误"}
+	COMPONENT_QUANTITY       = &Restful{-1020, " 零件数量输入错误"}
+	COMPONENT_ID_NOT_EXIST   = &Restful{-1021, " 零件id不存在"}
 )

@@ -65,3 +65,9 @@ func DelComponentById(id int) (int64, error) {
 	affected, err := engine.Where("id = ?", id).Delete(&component)
 	return affected, err
 }
+
+func IsExistComponentId(id int64) (bool, error) {
+	component := new(Components)
+	has, err := engine.Where("id = ?", id).Exist(&component)
+	return has, err
+}
