@@ -11,8 +11,8 @@ import (
 //Route
 func Login() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		username := c.QueryParam("username")
-		password := c.QueryParam("password")
+		username := c.FormValue("username")
+		password := c.FormValue("password")
 
 		//MD5加密
 		psswd := cookie.MD5(password)
