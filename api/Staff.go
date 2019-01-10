@@ -134,7 +134,6 @@ func CreateStaff() echo.HandlerFunc {
 			return sendError(errors.DO_ERROR, c)
 		}
 		//successful := &errors.Successful{1, "添加用户成功"}
-
 		id, _ := models.GetIdbyUsername(EnglishName)
 		fmt.Println(id)
 		models.InitPermission(id)
