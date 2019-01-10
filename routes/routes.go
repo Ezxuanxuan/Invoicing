@@ -32,12 +32,14 @@ func Init() *echo.Echo {
 		v1.POST("/component/get/no", api.GetComponentByNo())
 
 		v1.POST("/in/create/order", api.CreateInOrder())
-		v1.POST("/in/crea")
-		v1.POST("/in/crea")
-		v1.POST("/in/crea")
-		v1.POST("/in/crea")
-		v1.POST("/in/crea")
-		v1.POST("/in/crea")
+		v1.POST("/in/insert/one", api.InsertComponentIn())
+		v1.POST("/in/insert/some", api.InsertComponentsIn())
+		v1.POST("/in/verb/id", api.VerbInById())
+		v1.POST("/in/verb/order", api.VerbInByOrderNo())
+		v1.POST("/in/del/id", api.DelInById())
+		v1.POST("/in/update/quantity/id", api.UpdateInQuantityById())
+		v1.POST("/in/get/order", api.GetInByOrderNo())
+		v1.POST("/in/get/order/status", api.GetInByOrderNoByStatus())
 	}
 	return e
 }

@@ -210,6 +210,54 @@ func UpdateInQuantityById() echo.HandlerFunc {
 
 func GetInByOrderNo() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return nil
+		OrderNo := c.FormValue("order_no")
+		//查询入库单是否存在
+		if OrderNo == "" {
+			return sendError(errors.Order_NOT_EXIST, c)
+		}
+		has, err := models.IsExistOrderNo(OrderNo)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if !has {
+			return sendError(errors.Order_NOT_EXIST, c)
+		}
+
+		ins, err := models.GetInByOrderNo(OrderNo)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		return sendSuccess(1, ins, "以上为该order中所有的零件", c)
+	}
+}
+
+func GetInByOrderNoByStatus() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		OrderNo := c.FormValue("order_no")
+		Status := c.FormValue("status")
+
+		var status int64 = 0
+		if Status == "已通过" {
+			status = 1
+		} else if Status == "未通过" {
+			status = -1
+		}
+		//查询入库单是否存在
+		if OrderNo == "" {
+			return sendError(errors.Order_NOT_EXIST, c)
+		}
+		has, err := models.IsExistOrderNo(OrderNo)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if !has {
+			return sendError(errors.Order_NOT_EXIST, c)
+		}
+
+		ins, err := models.GetInByOrderNoByStatus(OrderNo, status)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		return sendSuccess(1, ins, "以上为该order中所有的零件", c)
 	}
 }

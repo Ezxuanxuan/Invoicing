@@ -52,3 +52,21 @@ func UpdateInStatusByOrderNo(order_no string, status int64) error {
 	_, err := engine.Exec(sql, status, order_no)
 	return err
 }
+
+type ComponentIns struct {
+	Ins        `xorm:"extends"`
+	Components `xorm:"extends"`
+}
+
+//查询某给单号下的所有零件，包含零件信息
+func GetInByOrderNo(order_no string) ([]ComponentIns, error) {
+	ins := make([]ComponentIns, 0)
+	err := engine.Table("ins").Join("INNER", "components", "components.id = ins.component_id").Where("order_no = ?", order_no).Find(&ins)
+	return ins, err
+}
+
+func GetInByOrderNoByStatus(order_no string, status int64) ([]ComponentIns, error) {
+	ins := make([]ComponentIns, 0)
+	err := engine.Table("ins").Join("INNER", "components", "components.id = ins.component_id").Where("order_no = ? and status = ?", order_no, status).Find(&ins)
+	return ins, err
+}
