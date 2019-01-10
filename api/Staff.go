@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/Invoicing/cookie"
 	"github.com/Invoicing/error"
 	"github.com/Invoicing/models"
@@ -134,7 +135,8 @@ func CreateStaff() echo.HandlerFunc {
 		}
 		//successful := &errors.Successful{1, "添加用户成功"}
 
-		id, _ := models.GetIdbyUsername(Name)
+		id, _ := models.GetIdbyUsername(EnglishName)
+		fmt.Println(id)
 		models.InitPermission(id)
 		return sendSuccess(1, "", "添加用户成功", c)
 	}

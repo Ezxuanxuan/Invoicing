@@ -41,7 +41,7 @@ func GetPasswordbyUsername(username string) (string, error) {
 //根据用户名获取id
 func GetIdbyUsername(username string) (int64, error) {
 	staff := new(Staffs)
-	_, err := engine.Where("english_name = ?", username).Get(staff)
+	_, err := engine.Where("english_name = ?", username).Get(&staff)
 	return staff.Id, err
 }
 
