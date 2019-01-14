@@ -139,6 +139,7 @@ func DelInById(id int64) error {
 	if in.Status == 0 {
 		_, err = engine.Where("id = ?", id).Delete(new(Ins))
 	}
+	return err
 }
 
 func UpdateInQuantityById(id int64, quantity int64) error {

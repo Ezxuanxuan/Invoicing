@@ -35,4 +35,5 @@ var (
 	COMPONENT_QUANTITY       = &Restful{-1020, " 零件数量输入错误"}
 	COMPONENT_ID_NOT_EXIST   = &Restful{-1021, " 零件id不存在"}
 	IN_QUANTITY_ERROR        = &Restful{-1022, "零件数量不能小于0"}
+	COMPONENT_NO_NOT_EXSIT   = &Restful{-1023, "零件编号不存在"}
 )

@@ -27,9 +27,9 @@ func GetAllComponent() ([]Components, error) {
 }
 
 //根据零件id返回零件信息
-func GetComponentById(id int) (Components, error) {
+func GetComponentById(id int64) (Components, error) {
 	component := new(Components)
-	_, err := engine.Where("id = ?", id).Get(&component)
+	_, err := engine.Where("id = ?", id).Get(component)
 	if err != nil {
 		return Components{}, err
 	}
@@ -37,13 +37,13 @@ func GetComponentById(id int) (Components, error) {
 }
 
 //根据零件编号返回零件
-func GetComponentByNo(no string) (Components, error) {
+func GetComponentByNo(no string) (bool, Components, error) {
 	component := new(Components)
-	_, err := engine.Where("no = ?", no).Get(&component)
+	has, err := engine.Where("no = ?", no).Get(component)
 	if err != nil {
-		return Components{}, err
+		return has, Components{}, err
 	}
-	return *component, nil
+	return has, *component, nil
 }
 
 //添加零件
@@ -55,19 +55,19 @@ func CreateComponent(component Components) (int64, error) {
 //是否存在该零件编号
 func IsExsitComponentNo(no string) (bool, error) {
 	component := new(Components)
-	has, err := engine.Where("no = ?", no).Exist(&component)
+	has, err := engine.Where("no = ?", no).Exist(component)
 	return has, err
 }
 
 //通过id删除该零件信息
-func DelComponentById(id int) (int64, error) {
+func DelComponentById(id int64) (int64, error) {
 	component := new(Components)
-	affected, err := engine.Where("id = ?", id).Delete(&component)
+	affected, err := engine.Where("id = ?", id).Delete(component)
 	return affected, err
 }
 
 func IsExistComponentId(id int64) (bool, error) {
 	component := new(Components)
-	has, err := engine.Where("id = ?", id).Exist(&component)
+	has, err := engine.Where("id = ?", id).Exist(component)
 	return has, err
 }
