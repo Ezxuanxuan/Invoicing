@@ -40,17 +40,75 @@ func InsertComponents(order_no string, component_ids []int64, quantity int64, st
 }
 
 //更新某条记录的审核状态
-func UpdateInStatusById(id int64, status int64) (int64, error) {
+func UpdateInStatusById(id int64, status int64) error {
+	session := engine.NewSession()
+	defer session.Close()
+	err := session.Begin()
 	in := new(Ins)
 	in.Status = status
-	return engine.Where("id = ?", id).Update(in)
+	_, err = session.Where("id = ?", id).Update(in)
+	if err != nil {
+		session.Rollback()
+		return err
+	}
+
+	//如果status为已经审核
+	if status == 1 {
+		in2 := new(Ins)
+		//查询该条记录的零件和变更数量
+		has, err := session.Where("id = ?", id).Get(in2)
+		if err != nil || !has {
+			session.Rollback()
+			return err
+
+		}
+		//更改零件表中的库存数量
+		sql := "update 'ins' set quantity = quantity + ? where id  = ?"
+		_, err = session.Exec(sql, in2.Quantity, in2.ComponentId)
+		if err != nil {
+			session.Rollback()
+			return err
+		}
+	}
+
+	return nil
+
 }
 
-//更新某个order的记录审核状态,智能更改待审核订单的状态
+//更新某个order的记录审核状态,只更改待审核订单的状态
 func UpdateInStatusByOrderNo(order_no string, status int64) error {
-	sql := "update 'ins' set status =? where order_no = ? and status = 0"
-	_, err := engine.Exec(sql, status, order_no)
-	return err
+	session := engine.NewSession()
+	defer session.Close()
+	err := session.Begin()
+	//更新当前order中全部的状态
+	_, err = session.Table(new(Ins)).Where("order_no = ?", order_no).Update(map[string]interface{}{"status": status})
+	if err != nil {
+		session.Rollback()
+		return err
+	}
+
+	//如果status为已经审核
+	if status == 1 {
+		ins := make([]*Ins, 0)
+		//查询该条记录的零件和变更数量
+		has, err := session.Where("order_no = ?", order_no).Get(ins)
+		if err != nil || !has {
+			session.Rollback()
+			return err
+		}
+		//更改零件表中的库存数量
+		sql := "update 'ins' set quantity = quantity + ? where id  = ?"
+		for i := 0; i < len(ins); i++ {
+			_, err = session.Exec(sql, ins[i].Quantity, ins[i].ComponentId)
+			if err != nil {
+				session.Rollback()
+				return err
+			}
+
+		}
+	}
+
+	return nil
 }
 
 type ComponentIns struct {
@@ -69,4 +127,27 @@ func GetInByOrderNoByStatus(order_no string, status int64) ([]ComponentIns, erro
 	ins := make([]ComponentIns, 0)
 	err := engine.Table("ins").Join("INNER", "components", "components.id = ins.component_id").Where("order_no = ? and status = ?", order_no, status).Find(&ins)
 	return ins, err
+}
+
+func DelInById(id int64) error {
+	in := new(Ins)
+	_, err := engine.Where("id = ?", id).Get(in)
+	if err != nil {
+		return err
+	}
+	//只可以删除未审核的
+	if in.Status == 0 {
+		_, err = engine.Where("id = ?", id).Delete(new(Ins))
+	}
+}
+
+func UpdateInQuantityById(id int64, quantity int64) error {
+	_, err := engine.Table(new(Ins)).Where("id = ?", id).Update(map[string]interface{}{"quantity": quantity})
+	return err
+}
+
+func GetInQuantityById(id int64) (int64, error) {
+	in := new(Ins)
+	_, err := engine.Id(id).Get(in)
+	return in.Quantity, err
 }

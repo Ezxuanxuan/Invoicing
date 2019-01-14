@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+//创建空的入库单
 func CreateInOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		No := c.FormValue("no")   //入库单编号
@@ -38,6 +39,7 @@ func CreateInOrder() echo.HandlerFunc {
 	}
 }
 
+//向入库单中插入零件
 func InsertComponentIn() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		No := c.FormValue("no")                     //入库单编号
@@ -84,6 +86,7 @@ func InsertComponentIn() echo.HandlerFunc {
 	}
 }
 
+//批量向入库单中插入零件
 func InsertComponentsIn() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		No := c.FormValue("no")                       //入库单编号
@@ -140,6 +143,7 @@ func InsertComponentsIn() echo.HandlerFunc {
 	}
 }
 
+//通过id审核某条入库记录
 func VerbInById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		Id := c.FormValue("id")
@@ -156,14 +160,15 @@ func VerbInById() echo.HandlerFunc {
 			status = -1
 		}
 
-		affected, err := models.UpdateInStatusById(id, status)
-		if err != nil || affected < 1 {
+		err = models.UpdateInStatusById(id, status)
+		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "更改审核状态成功", c)
 	}
 }
 
+//审核某整张入库单
 func VerbInByOrderNo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		OrderNo := c.FormValue("order_no")
@@ -196,18 +201,52 @@ func VerbInByOrderNo() echo.HandlerFunc {
 	}
 }
 
+//通过id删除某入库单记录
 func DelInById() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return nil
+		Id := c.FormValue("id")
+		id, err := strconv.ParseInt(Id, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+
+		err = models.DelInById(id)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		return sendSuccess(1, "", "删除成功", c)
 	}
 }
 
+//修改入库单某条记录的数量
 func UpdateInQuantityById() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return nil
+		Id := c.FormValue("id")
+		Quantity := c.FormValue("quantity")
+
+		id, err := strconv.ParseInt(Id, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+
+		//将数量转换成int64
+		quantity, err := strconv.ParseInt(Quantity, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+		if quantity < 0 {
+			return sendError(errors.IN_QUANTITY_ERROR, c)
+		}
+		err = models.UpdateInQuantityById(id, quantity)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+
+		return sendSuccess(1, "", "修改数量成功", c)
 	}
 }
 
+//查询入库单的全部零件信息
 func GetInByOrderNo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		OrderNo := c.FormValue("order_no")
@@ -231,6 +270,7 @@ func GetInByOrderNo() echo.HandlerFunc {
 	}
 }
 
+//获取某入库单中某中状态的全部零件信息
 func GetInByOrderNoByStatus() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		OrderNo := c.FormValue("order_no")
