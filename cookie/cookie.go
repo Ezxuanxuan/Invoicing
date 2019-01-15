@@ -2,26 +2,36 @@ package cookie
 
 import (
 	"crypto/md5"
+	"encoding/base64"
+	"encoding/binary"
 	"encoding/hex"
 	"strconv"
-	"strings"
 )
 
-const key = ":djasgDAGHH_ji1283"
+const (
+	base64Table = "0123456789+abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+)
+
+var coder = base64.NewEncoding(base64Table)
 
 //加密
 func EncryptionId(id int64) string {
-	return strconv.FormatInt(id, 10) + key
+	temp := strconv.FormatInt(id, 10)
+	src := []byte(temp)
+	return string(coder.EncodeToString(src))
 }
 
 //解密
 func DecryptId(idValue string) int64 {
-	ss := strings.Split(idValue, ":")
-	id, err := strconv.ParseInt(ss[0], 10, 64)
+	re, err := coder.DecodeString(idValue)
 	if err != nil {
-		return -1
+		return 0
 	}
-	return id
+	temp, err := strconv.ParseInt(string(re), 10, 64)
+	if err != nil {
+		return 0
+	}
+	return temp
 }
 
 //MD5加密
@@ -30,4 +40,14 @@ func MD5(str string) string {
 	h.Write([]byte(str))
 	cipherStr := h.Sum(nil)
 	return hex.EncodeToString(cipherStr)
+}
+
+func Int64ToBytes(i int64) []byte {
+	var buf = make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, uint64(i))
+	return buf
+}
+
+func BytesToInt64(buf []byte) int64 {
+	return int64(binary.BigEndian.Uint64(buf))
 }

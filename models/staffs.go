@@ -84,7 +84,7 @@ func IsExitStaffById(id int64) (bool, error) {
 func UpdatePassword(id int64, password string) (int64, error) {
 	staff := new(Staffs)
 	staff.Password = password
-	affected, err := engine.Where("id = ?", id).Cols("password").Update(&staff)
+	affected, err := engine.Where("id = ?", id).Cols("password").Update(staff)
 	return affected, err
 }
 
@@ -92,6 +92,6 @@ func UpdatePassword(id int64, password string) (int64, error) {
 func UpdateTelephone(id int64, telephone string) (int64, error) {
 	staff := new(Staffs)
 	staff.Telephone = telephone
-	affected, err := engine.Id(id).Cols("telephone").Update(&staff)
+	affected, err := engine.Id(id).Cols("telephone").Update(staff)
 	return affected, err
 }

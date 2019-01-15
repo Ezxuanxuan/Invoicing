@@ -187,7 +187,7 @@ func UpdateTelephone() echo.HandlerFunc {
 
 		//更新前先解密id
 		id := cookie.DecryptId(UserId)
-
+		fmt.Println(id)
 		//校验id是否存在
 		has, err := models.IsExitStaffById(id)
 		if err != nil {
@@ -201,8 +201,8 @@ func UpdateTelephone() echo.HandlerFunc {
 		if !isAllNumic(Telephone) || Telephone == "" {
 			return sendError(errors.PHONE_ERROR, c)
 		}
-		affected, err := models.UpdateTelephone(id, Telephone)
-		if err != nil || affected < 1 {
+		_, err = models.UpdateTelephone(id, Telephone)
+		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "更新电话号码成功", c)
