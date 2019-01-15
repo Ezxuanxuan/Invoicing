@@ -19,16 +19,14 @@ type Staffs struct {
 }
 
 //根据用户名获取用户数量
-func GetUserCountbyUsername(username string) (int64, error) {
-
+func GetUserbyUsername(username string) (Staffs, error) {
 	staff := new(Staffs)
 	//查询该用户名是否有账号
-	total, err := engine.Where("english_name = ?", username).Count(staff)
+	_, err := engine.Where("english_name = ?", username).Get(staff)
 	if err != nil {
-		return 0, err
+		return Staffs{}, err
 	}
-	return total, nil
-	//	.Model(&Staff{}).Where("english_name = ?", username).Count(&count)
+	return *staff, nil
 }
 
 //根据用户名获取密码

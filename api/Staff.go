@@ -23,12 +23,12 @@ func Login() echo.HandlerFunc {
 			return sendError(errors.INPUT_USER_ERROR, c)
 		}
 
-		total, err := models.GetUserCountbyUsername(username)
+		has, err := models.IsExitEnglishName(username)
 		//不存在该用户
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
-		if total < 1 {
+		if !has {
 			return sendError(errors.USER_NOT_EXI, c)
 		}
 
@@ -41,19 +41,20 @@ func Login() echo.HandlerFunc {
 			return sendError(errors.PASS_ERROR, c)
 		}
 		//获取用户id
-		userId, err := models.GetIdbyUsername(username)
+		user, err := models.GetUserbyUsername(username)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
 		//加密并返回给前端
-		IdValue := cookie.EncryptionId(userId)
-		permission, err := models.GetPermissionByStaff(userId)
+		IdValue := cookie.EncryptionId(user.Id)
+		permission, err := models.GetPermissionByStaff(user.Id)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
 		revalue := reValue{
 			Id:         IdValue,
 			Permission: permission,
+			Name:       user.Name,
 		}
 
 		return sendSuccess(1, revalue, "账号密码校验成功", c)
@@ -63,6 +64,7 @@ func Login() echo.HandlerFunc {
 type reValue struct {
 	Id         string
 	Permission string
+	Name       string
 }
 
 //注册用户
