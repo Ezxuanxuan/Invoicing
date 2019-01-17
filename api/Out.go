@@ -8,20 +8,20 @@ import (
 	"strings"
 )
 
-const IN = 1
+const OUT = 2
 
 //创建空的入库单
-func CreateInOrder() echo.HandlerFunc {
+func CreateOutOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		No := c.FormValue("no")   //入库单编号
-		Tag := c.FormValue("tag") //入库单备注
-		var Type int64 = IN       //入库单类型
+		No := c.FormValue("no")   //出库单编号
+		Tag := c.FormValue("tag") //出库单备注
+		var Type int64 = OUT      //出库单类型
 
-		//查询入库单是否存在
+		//查询出库单是否存在
 		if No == "" {
 			return sendError(errors.Order_NOT_EXIST, c)
 		}
-		has, err := models.IsExistOrderNo(No, IN)
+		has, err := models.IsExistOrderNo(No, OUT)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -37,23 +37,23 @@ func CreateInOrder() echo.HandlerFunc {
 		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
-		return sendSuccess(1, "", "创建入库单成功", c)
+		return sendSuccess(1, "", "创建出库单成功", c)
 	}
 }
 
 //向入库单中插入零件
-func InsertComponentIn() echo.HandlerFunc {
+func InsertComponentOut() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		No := c.FormValue("no")                     //入库单编号
 		Component_id := c.FormValue("component_id") //零件id
 		Quantity := c.FormValue("quantity")         //零件数量
 		var Status int64 = 0                        //未审核
 
-		//查询入库单是否存在
+		//查询出库单是否存在
 		if No == "" {
 			return sendError(errors.Order_NOT_EXIST, c)
 		}
-		has, err := models.IsExistOrderNo(No, IN)
+		has, err := models.IsExistOrderNo(No, OUT)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -66,11 +66,12 @@ func InsertComponentIn() echo.HandlerFunc {
 		if err != nil {
 			return sendError(errors.INPUT_ERROR, c)
 		}
-		has, err = models.IsExistComponentId(component_id)
+		//查看零件id是否存在
+		has1, err := models.IsExistComponentId(component_id)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
-		if !has {
+		if !has1 {
 			return sendError(errors.COMPONENT_ID_NOT_EXIST, c)
 		}
 
@@ -79,8 +80,14 @@ func InsertComponentIn() echo.HandlerFunc {
 		if err != nil {
 			return sendError(errors.INPUT_ERROR, c)
 		}
+
+		//获取仓库中零件数量，并且做对比
+		componentQuantity, _ := models.GetComponentQuantityById(component_id)
+		if componentQuantity < quantity {
+			return sendError(errors.INVENTORY_SHORTAGE, c)
+		}
 		//插入
-		affected, err := models.InsertInComponet(No, component_id, quantity, Status)
+		affected, err := models.InsertOutComponet(No, component_id, quantity, Status)
 		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -89,7 +96,7 @@ func InsertComponentIn() echo.HandlerFunc {
 }
 
 //批量向入库单中插入零件
-func InsertComponentsIn() echo.HandlerFunc {
+func InsertComponentsOut() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		No := c.FormValue("no")                       //入库单编号
 		Component_ids := c.FormValue("component_ids") //零件id数组
@@ -123,7 +130,7 @@ func InsertComponentsIn() echo.HandlerFunc {
 		if No == "" {
 			return sendError(errors.Order_NOT_EXIST, c)
 		}
-		has, err := models.IsExistOrderNo(No, IN)
+		has, err := models.IsExistOrderNo(No, OUT)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -137,7 +144,7 @@ func InsertComponentsIn() echo.HandlerFunc {
 			return sendError(errors.INPUT_ERROR, c)
 		}
 		//插入
-		affected, err := models.InsertInComponents(No, component_ids, quantity, Status)
+		affected, err := models.InsertOutComponents(No, component_ids, quantity, Status)
 		if err != nil || affected < 1 {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -146,7 +153,7 @@ func InsertComponentsIn() echo.HandlerFunc {
 }
 
 //通过id审核某条入库记录
-func VerbInById() echo.HandlerFunc {
+func VerbOutById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		Id := c.FormValue("id")
 		Status := c.FormValue("status")
@@ -162,7 +169,7 @@ func VerbInById() echo.HandlerFunc {
 			status = -1
 		}
 
-		err = models.UpdateInStatusById(id, status)
+		err = models.UpdateOutStatusById(id, status)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -171,7 +178,7 @@ func VerbInById() echo.HandlerFunc {
 }
 
 //审核某整张入库单
-func VerbInByOrderNo() echo.HandlerFunc {
+func VerbOutByOrderNo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		OrderNo := c.FormValue("order_no")
 		Status := c.FormValue("status")
@@ -180,7 +187,7 @@ func VerbInByOrderNo() echo.HandlerFunc {
 		if OrderNo == "" {
 			return sendError(errors.Order_NOT_EXIST, c)
 		}
-		has, err := models.IsExistOrderNo(OrderNo, IN)
+		has, err := models.IsExistOrderNo(OrderNo, OUT)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -195,7 +202,7 @@ func VerbInByOrderNo() echo.HandlerFunc {
 			status = -1
 		}
 
-		err = models.UpdateInStatusByOrderNo(OrderNo, status)
+		err = models.UpdateOutStatusByOrderNo(OrderNo, status)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -204,7 +211,7 @@ func VerbInByOrderNo() echo.HandlerFunc {
 }
 
 //通过id删除某入库单记录
-func DelInById() echo.HandlerFunc {
+func DelOutById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		Id := c.FormValue("id")
 		id, err := strconv.ParseInt(Id, 10, 64)
@@ -212,7 +219,7 @@ func DelInById() echo.HandlerFunc {
 			return sendError(errors.INPUT_ERROR, c)
 		}
 
-		err = models.DelInById(id)
+		err = models.DelOutById(id)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -221,7 +228,7 @@ func DelInById() echo.HandlerFunc {
 }
 
 //修改入库单某条记录的数量
-func UpdateInQuantityById() echo.HandlerFunc {
+func UpdateOutQuantityById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		Id := c.FormValue("id")
 		Quantity := c.FormValue("quantity")
@@ -239,7 +246,7 @@ func UpdateInQuantityById() echo.HandlerFunc {
 		if quantity < 0 {
 			return sendError(errors.IN_QUANTITY_ERROR, c)
 		}
-		err = models.UpdateInQuantityById(id, quantity)
+		err = models.UpdateOutQuantityById(id, quantity)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -249,14 +256,14 @@ func UpdateInQuantityById() echo.HandlerFunc {
 }
 
 //查询入库单的全部零件信息
-func GetInByOrderNo() echo.HandlerFunc {
+func GetOutByOrderNo() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		OrderNo := c.FormValue("order_no")
 		//查询入库单是否存在
 		if OrderNo == "" {
 			return sendError(errors.Order_NOT_EXIST, c)
 		}
-		has, err := models.IsExistOrderNo(OrderNo, IN)
+		has, err := models.IsExistOrderNo(OrderNo, OUT)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -264,7 +271,7 @@ func GetInByOrderNo() echo.HandlerFunc {
 			return sendError(errors.Order_NOT_EXIST, c)
 		}
 
-		ins, err := models.GetInByOrderNo(OrderNo)
+		ins, err := models.GetOutByOrderNo(OrderNo)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -273,7 +280,7 @@ func GetInByOrderNo() echo.HandlerFunc {
 }
 
 //获取某入库单中某中状态的全部零件信息
-func GetInByOrderNoByStatus() echo.HandlerFunc {
+func GetOutByOrderNoByStatus() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		OrderNo := c.FormValue("order_no")
 		Status := c.FormValue("status")
@@ -288,7 +295,7 @@ func GetInByOrderNoByStatus() echo.HandlerFunc {
 		if OrderNo == "" {
 			return sendError(errors.Order_NOT_EXIST, c)
 		}
-		has, err := models.IsExistOrderNo(OrderNo, IN)
+		has, err := models.IsExistOrderNo(OrderNo, OUT)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -296,7 +303,7 @@ func GetInByOrderNoByStatus() echo.HandlerFunc {
 			return sendError(errors.Order_NOT_EXIST, c)
 		}
 
-		ins, err := models.GetInByOrderNoByStatus(OrderNo, status)
+		ins, err := models.GetOutByOrderNoByStatus(OrderNo, status)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}

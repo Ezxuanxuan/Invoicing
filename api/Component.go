@@ -29,13 +29,13 @@ func CreateComponent() echo.HandlerFunc {
 			return sendError(errors.COMPONENT_MATERIAL_ERROR, c)
 		}
 		//将质量转为int类型
-		quality, err := strconv.Atoi(Quality)
+		quality, err := strconv.ParseInt(Quality, 10, 64)
 		if err != nil {
 			return sendError(errors.COMPONENT_QUALITY_ERROR, c)
 		}
 
 		//将数量 转为int类型
-		quantity, err := strconv.Atoi(Quantity)
+		quantity, err := strconv.ParseInt(Quantity, 10, 64)
 		if err != nil {
 			return sendError(errors.COMPONENT_QUANTITY, c)
 		}

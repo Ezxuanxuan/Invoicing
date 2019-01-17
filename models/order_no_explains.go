@@ -16,7 +16,7 @@ func CreateOrder(No string, Type int64, Tag string) (int64, error) {
 }
 
 //查询是否存在该单号
-func IsExistOrderNo(no string) (bool, error) {
+func IsExistOrderNo(no string, order_type int64) (bool, error) {
 	order := new(OrderNoExplains)
-	return engine.Where("order_no = ?", order).Exist(order)
+	return engine.Where("order_no = ? and order_type = ?", order, order_type).Exist(order)
 }

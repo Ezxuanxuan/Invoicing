@@ -16,7 +16,7 @@ type Ins struct {
 }
 
 //插入一条新零件
-func InsertComponet(order_no string, component_id int64, quantity int64, status int64) (int64, error) {
+func InsertInComponet(order_no string, component_id int64, quantity int64, status int64) (int64, error) {
 	in := new(Ins)
 	in.OrderNo = order_no
 	in.ComponentId = component_id
@@ -27,7 +27,7 @@ func InsertComponet(order_no string, component_id int64, quantity int64, status 
 }
 
 //插入多个新零件
-func InsertComponents(order_no string, component_ids []int64, quantity int64, status int64) (int64, error) {
+func InsertInComponents(order_no string, component_ids []int64, quantity int64, status int64) (int64, error) {
 	ins := make([]*Ins, 1)
 	for i := 0; i < len(component_ids); i++ {
 		ins[i] = new(Ins)

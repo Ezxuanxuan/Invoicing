@@ -40,6 +40,16 @@ func Init() *echo.Echo {
 		v1.POST("/in/update/quantity/id", api.UpdateInQuantityById())
 		v1.POST("/in/get/order", api.GetInByOrderNo())
 		v1.POST("/in/get/order/status", api.GetInByOrderNoByStatus())
+
+		v1.POST("/out/create/order", api.CreateOutOrder())
+		v1.POST("/out/insert/one", api.InsertComponentOut())
+		v1.POST("/out/insert/some", api.InsertComponentsOut())
+		v1.POST("/out/verb/id", api.VerbOutById())
+		v1.POST("/out/verb/order", api.VerbOutByOrderNo())
+		v1.POST("/out/del/id", api.DelOutById())
+		v1.POST("/out/update/quantity/id", api.UpdateOutQuantityById())
+		v1.POST("/out/get/order", api.GetOutByOrderNo())
+		v1.POST("/out/get/order/status", api.GetOutByOrderNoByStatus())
 	}
 	return e
 }

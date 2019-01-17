@@ -5,15 +5,15 @@ import (
 )
 
 type Components struct {
-	Id        int       `xorm:"not null pk autoincr INT(11)"`
+	Id        int64     `xorm:"not null pk autoincr INT(11)"`
 	CreatedAt time.Time `xorm:"created"`
 	UpdatedAt time.Time `xorm:"updated"`
 	DeletedAt time.Time `xorm:"index TIMESTAMP"`
 	No        string    `xorm:"VARCHAR(30)"`
 	Name      string    `xorm:"VARCHAR(30)"`
 	Material  string    `xorm:"VARCHAR(30)"`
-	Quality   int       `xorm:"INT(11)"` //质量
-	Quantity  int       `xorm:"INT(11)"` //数量
+	Quality   int64     `xorm:"INT(11)"` //质量
+	Quantity  int64     `xorm:"INT(11)"` //数量
 }
 
 //返回所有零件信息
@@ -70,4 +70,14 @@ func IsExistComponentId(id int64) (bool, error) {
 	component := new(Components)
 	has, err := engine.Where("id = ?", id).Exist(component)
 	return has, err
+}
+
+//根据零件id返回零件信息
+func GetComponentQuantityById(id int64) (int64, error) {
+	component := new(Components)
+	_, err := engine.Where("id = ?", id).Get(component)
+	if err != nil {
+		return 0, err
+	}
+	return component.Quantity, nil
 }
