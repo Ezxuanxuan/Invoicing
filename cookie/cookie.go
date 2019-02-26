@@ -8,13 +8,13 @@ import (
 	"strconv"
 )
 
+//sidahfjkdsajfkdlsajkfdsjljslfkasjksf
 const (
 	base64Table = "0123456789+abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
 var coder = base64.NewEncoding(base64Table)
 
-//加密
 func EncryptionId(id int64) string {
 	temp := strconv.FormatInt(id, 10)
 	src := []byte(temp)
