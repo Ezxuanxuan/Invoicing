@@ -59,9 +59,47 @@ func IsExitEnglishName(EnglishName string) (bool, error) {
 }
 
 //创建用户,返回受影响行数
-func CreateUser(staff Staffs) (int64, error) {
-	affected, err := engine.Insert(&staff)
-	return affected, err
+func CreateUser(staff Staffs) (bool, error) {
+	session := engine.NewSession()
+	err := session.Begin()
+	defer session.Close()
+
+	//创建用户
+	_, err = session.Insert(&staff)
+	if err != nil {
+		session.Rollback()
+		return false, err
+	}
+	//获取数据库中该用户
+	staff2 := new(Staffs)
+	has, err := session.Where("english_name = ?", staff.EnglishName).Get(staff2)
+	if err != nil {
+		session.Rollback()
+		return false, err
+	}
+	if !has {
+		session.Rollback()
+		return false, nil
+	}
+	if staff2.Id == 0 {
+		session.Rollback()
+		return false, nil
+	}
+
+	//添加新添加用的权限，默认全为0
+	permission := new(Permissions)
+	permission.StaffId = staff2.Id
+	permission.Context = "00000000000"
+	_, err = session.Insert(permission)
+	if err != nil {
+		session.Rollback()
+		return false, err
+	}
+	err = session.Commit()
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 //获取所有用户信息

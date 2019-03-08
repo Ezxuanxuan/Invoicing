@@ -26,3 +26,5 @@ func GetPurchasesByOrder(orderId int64) ([]Purchases, bool, error) {
 	has, err := engine.Where("order_id = ?", orderId).Get(&purchases)
 	return purchases, has, err
 }
+
+//func ChangePurchase2Pro()

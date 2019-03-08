@@ -131,14 +131,13 @@ func CreateStaff() echo.HandlerFunc {
 			Telephone:   Telephone,
 		}
 
-		affected, err := models.CreateUser(staff)
-		if err != nil || affected != 1 {
+		ok, err := models.CreateUser(staff)
+		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
-		//successful := &errors.Successful{1, "添加用户成功"}
-		id, _ := models.GetIdbyUsername(EnglishName)
-		fmt.Println(id)
-		models.InitPermission(id)
+		if !ok {
+			return sendError(errors.DO_ERROR, c)
+		}
 		return sendSuccess(1, "", "添加用户成功", c)
 	}
 }

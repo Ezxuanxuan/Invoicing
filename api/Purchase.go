@@ -80,3 +80,15 @@ func CreatePurchaseOrder() echo.HandlerFunc {
 		return sendSuccess(1, "", "已经生成全部相关order", c)
 	}
 }
+
+//func ChangePurchaseById() echo.HandlerFunc {
+//	return func(c echo.Context) error {
+//		id := c.FormValue("id")
+//
+//		Id, err := strconv.ParseInt(id, 10, 64)
+//		if err != nil {
+//			return sendError(errors.INPUT_ERROR, c)
+//		}
+//
+//	}
+//}
