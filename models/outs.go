@@ -18,6 +18,20 @@ type Outs struct {
 
 //插入一条新零件
 func InsertOutComponet(order_no string, component_id int64, quantity int64, status int64) (int64, error) {
+	out2 := new(Outs)
+	//查看该零件是否已存在
+	has, err := engine.Where("order_no = ? and component_id = ?", order_no, component_id).Get(out2)
+	if err != nil {
+		return 0, err
+	}
+	//如果该入库单中已经存在该id
+	if has {
+		out2.Quantity = quantity + out2.Quantity
+		_, err := engine.Update(out2)
+		if err != nil {
+			return 0, err
+		}
+	}
 	out := new(Outs)
 	out.OrderNo = order_no
 	out.ComponentId = component_id
@@ -29,59 +43,94 @@ func InsertOutComponet(order_no string, component_id int64, quantity int64, stat
 //插入多个新零件
 func InsertOutComponents(order_no string, component_ids []int64, quantity int64, status int64) (int64, error) {
 	outs := make([]*Outs, 1)
-	for i := 0; i < len(component_ids); i++ {
-		outs[i] = new(Outs)
-		outs[i].OrderNo = order_no
-		outs[i].ComponentId = component_ids[i]
-		outs[i].Quantity = quantity
-		outs[i].Status = status
+	session := engine.NewSession()
+	err1 := session.Begin()
+	if err1 != nil {
+		return 0, err1
 	}
-	return engine.Insert(outs)
+	defer session.Close()
+	for i := 0; i < len(component_ids); i++ {
+		out := new(Outs)
+		has, err := session.Where("order_no = ? and component_id = ?", order_no, component_ids[i]).Get(out)
+		if err != nil {
+			session.Rollback()
+			return 0, err
+		}
+		//如果该入库单中已经存在该id
+		if has {
+			out.Quantity = quantity + out.Quantity
+			_, err := session.Update(out)
+			if err != nil {
+				session.Rollback()
+				return 0, err
+			}
+		} else {
+			outs[i] = new(Outs)
+			outs[i].OrderNo = order_no
+			outs[i].ComponentId = component_ids[i]
+			outs[i].Quantity = quantity
+			outs[i].Status = status
+		}
+	}
+	affected, err2 := session.Insert(outs)
+	if err2 != nil {
+		session.Rollback()
+		return 0, err2
+	}
+
+	if err3 := session.Commit(); err3 != nil {
+		return 0, err3
+	}
+	return affected, err2
 }
 
 //更新某条记录的审核状态
-func UpdateOutStatusById(id int64, status int64) error {
+func UpdateOutStatusById(id int64, status int64) (bool, bool, error) {
 	session := engine.NewSession()
+	err = session.Begin()
 	defer session.Close()
-	err := session.Begin()
-	out := new(Outs)
-	out.Status = status
-	_, err = session.Where("id = ?", id).Update(out)
+	out2 := new(Outs)
+	//查询该条记录的零件和变更数量
+	has, err := session.Where("id = ?", id).Get(out2)
+	if err != nil || !has {
+		session.Rollback()
+		return false, false, err
+
+	}
+	if out2.Status != 0 {
+		return false, false, errors.New("not unverb")
+	}
+	out2.Status = status
+	sql := "update outs set status =? where id =?;"
+	_, err = session.Exec(sql, status, id)
 	if err != nil {
 		session.Rollback()
-		return err
+		return false, false, err
 	}
-
 	//如果status为已经审核
 	if status == 1 {
-		out2 := new(Outs)
-		//查询该条记录的零件和变更数量
-		has, err := session.Where("id = ?", id).Get(out2)
-		if err != nil || !has {
-			session.Rollback()
-			return err
-
-		}
 		component := new(Components)
 		_, err = session.Where("id = ?", out2.ComponentId).Get(component)
 		if err != nil {
 			session.Rollback()
-			return err
+			return false, false, err
 		}
 		if component.Quantity < out2.Quantity {
 			session.Rollback()
-			return errors.New("a pointer to a pointer is not allowed")
+			return true, false, errors.New("a pointer to a pointer is not allowed")
 		}
 		//更改零件表中的库存数量
-		sql := "update 'outs' set quantity = quantity - ? where id  = ? and quantity >= ?"
+		sql := "update components set quantity = quantity - ? where id  = ? and quantity >= ?"
 		_, err = session.Exec(sql, out2.Quantity, out2.ComponentId, out2.Quantity)
 		if err != nil {
 			session.Rollback()
-			return err
+			return false, false, err
 		}
 	}
-
-	return nil
+	if err3 := session.Commit(); err3 != nil {
+		return false, false, err3
+	}
+	return true, true, nil
 
 }
 
@@ -107,7 +156,7 @@ func UpdateOutStatusByOrderNo(order_no string, status int64) error {
 			return err
 		}
 		//更改零件表中的库存数量，前提是结果数量大于0
-		sql := "update 'outs' set quantity = quantity - ? where id  = ? and quantity >= ?"
+		sql := "update components set quantity = quantity - ? where id  = ? and quantity >= ?"
 		for i := 0; i < len(outs); i++ {
 			_, err = session.Exec(sql, outs[i].Quantity, outs[i].ComponentId, outs[i].Quantity)
 			if err != nil {

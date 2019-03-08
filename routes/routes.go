@@ -6,9 +6,9 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
-func Init() *echo.Echo {
+func Init() (e *echo.Echo) {
 
-	e := echo.New()
+	e = echo.New()
 	e.Use(middleware.CORS())
 	// Routes
 	v1 := e.Group("/api/v1")
@@ -51,5 +51,5 @@ func Init() *echo.Echo {
 		v1.POST("/out/get/order", api.GetOutByOrderNo())
 		v1.POST("/out/get/order/status", api.GetOutByOrderNoByStatus())
 	}
-	return e
+	return
 }

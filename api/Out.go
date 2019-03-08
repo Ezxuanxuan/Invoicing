@@ -1,14 +1,13 @@
 package api
 
 import (
+	"fmt"
 	"github.com/Invoicing/error"
 	"github.com/Invoicing/models"
 	"github.com/labstack/echo"
 	"strconv"
 	"strings"
 )
-
-const OUT = 2
 
 //创建空的入库单
 func CreateOutOrder() echo.HandlerFunc {
@@ -18,23 +17,26 @@ func CreateOutOrder() echo.HandlerFunc {
 		var Type int64 = OUT      //出库单类型
 
 		//查询出库单是否存在
+		//查询入库单是否存在
 		if No == "" {
-			return sendError(errors.Order_NOT_EXIST, c)
+			return sendError(errors.INPUT_ERROR, c)
 		}
 		has, err := models.IsExistOrderNo(No, OUT)
 		if err != nil {
+			fmt.Println(err)
 			return sendError(errors.DO_ERROR, c)
 		}
-		if !has {
-			return sendError(errors.Order_NOT_EXIST, c)
+		if has {
+			return sendError(errors.ORDER_EXIST, c)
 		}
 
 		//备注必须有
 		if Tag == "" {
 			return sendError(errors.DO_ERROR, c)
 		}
-		affected, err := models.CreateOrder(No, Type, Tag)
-		if err != nil || affected < 1 {
+		_, err = models.CreateOrder(No, Type, Tag)
+		if err != nil {
+			fmt.Println("nonono")
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "创建出库单成功", c)
@@ -169,9 +171,15 @@ func VerbOutById() echo.HandlerFunc {
 			status = -1
 		}
 
-		err = models.UpdateOutStatusById(id, status)
+		ok, en, err := models.UpdateOutStatusById(id, status)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
+		}
+		if !ok {
+			return sendError(errors.THE_ID_NOT_UNVERB, c)
+		}
+		if !en {
+			return sendError(errors.STOCK_NOT_ENOUGH, c)
 		}
 		return sendSuccess(1, "", "更改审核状态成功", c)
 	}

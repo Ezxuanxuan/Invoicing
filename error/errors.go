@@ -31,6 +31,7 @@ var (
 	COMPONENT_QUALITY_ERROR  = &Restful{-1014, "零件质量输入不合法"}
 	COMPONENT_NO_EXSIT       = &Restful{-1015, "零件编号已经存在"}
 	Order_NOT_EXIST          = &Restful{-1018, "该单号不存在"}
+	ORDER_EXIST              = &Restful{-1027, "该订单编号已经存在"}
 	TAG_ERROR                = &Restful{-1019, "备注输入错误"}
 	COMPONENT_QUANTITY       = &Restful{-1020, " 零件数量输入错误"}
 	COMPONENT_ID_NOT_EXIST   = &Restful{-1021, " 零件id不存在"}
@@ -38,4 +39,10 @@ var (
 	COMPONENT_NO_NOT_EXSIT   = &Restful{-1023, "零件编号不存在"}
 
 	INVENTORY_SHORTAGE = &Restful{-1024, "数量超出，库存不足"}
+
+	ID_ERROR          = &Restful{-1025, "id错误"}
+	PUCHASE_NOT_EXIST = &Restful{-1026, "该采购单不存在"}
+	ID_NOT_EXIST      = &Restful{-1028, "id不存在"}
+	THE_ID_NOT_UNVERB = &Restful{-1029, "该条订单记录不是未审核状态"}
+	STOCK_NOT_ENOUGH  = &Restful{-1030, "库存不足"}
 )

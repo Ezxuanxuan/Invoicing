@@ -45,7 +45,7 @@ func Login() echo.HandlerFunc {
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
-		//加密并返回给前端
+		//加密id并返回给前端
 		IdValue := cookie.EncryptionId(user.Id)
 		permission, err := models.GetPermissionByStaff(user.Id)
 		if err != nil {

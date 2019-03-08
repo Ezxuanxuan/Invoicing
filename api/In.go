@@ -1,14 +1,13 @@
 package api
 
 import (
+	"fmt"
 	"github.com/Invoicing/error"
 	"github.com/Invoicing/models"
 	"github.com/labstack/echo"
 	"strconv"
 	"strings"
 )
-
-const IN = 1
 
 //创建空的入库单
 func CreateInOrder() echo.HandlerFunc {
@@ -19,22 +18,24 @@ func CreateInOrder() echo.HandlerFunc {
 
 		//查询入库单是否存在
 		if No == "" {
-			return sendError(errors.Order_NOT_EXIST, c)
+			return sendError(errors.INPUT_ERROR, c)
 		}
 		has, err := models.IsExistOrderNo(No, IN)
 		if err != nil {
+			fmt.Println(err)
 			return sendError(errors.DO_ERROR, c)
 		}
-		if !has {
-			return sendError(errors.Order_NOT_EXIST, c)
+		if has {
+			return sendError(errors.ORDER_EXIST, c)
 		}
 
 		//备注必须有
 		if Tag == "" {
 			return sendError(errors.DO_ERROR, c)
 		}
-		affected, err := models.CreateOrder(No, Type, Tag)
-		if err != nil || affected < 1 {
+		_, err = models.CreateOrder(No, Type, Tag)
+		if err != nil {
+			fmt.Println("nonono")
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "创建入库单成功", c)
@@ -155,6 +156,13 @@ func VerbInById() echo.HandlerFunc {
 		if err != nil {
 			return sendError(errors.INPUT_ERROR, c)
 		}
+		has, err := models.IsExistInId(id)
+		if !has {
+			return sendError(errors.ID_NOT_EXIST, c)
+		}
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
 		var status int64 = 0
 		if Status == "已通过" {
 			status = 1
@@ -162,9 +170,12 @@ func VerbInById() echo.HandlerFunc {
 			status = -1
 		}
 
-		err = models.UpdateInStatusById(id, status)
+		ok, err := models.UpdateInStatusById(id, status)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
+		}
+		if !ok {
+			return sendError(errors.THE_ID_NOT_UNVERB, c)
 		}
 		return sendSuccess(1, "", "更改审核状态成功", c)
 	}
@@ -212,9 +223,12 @@ func DelInById() echo.HandlerFunc {
 			return sendError(errors.INPUT_ERROR, c)
 		}
 
-		err = models.DelInById(id)
+		ok, err := models.DelInById(id)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
+		}
+		if !ok {
+			return sendError(errors.THE_ID_NOT_UNVERB, c)
 		}
 		return sendSuccess(1, "", "删除成功", c)
 	}
@@ -239,7 +253,10 @@ func UpdateInQuantityById() echo.HandlerFunc {
 		if quantity < 0 {
 			return sendError(errors.IN_QUANTITY_ERROR, c)
 		}
-		err = models.UpdateInQuantityById(id, quantity)
+		ok, err := models.UpdateInQuantityById(id, quantity)
+		if !ok {
+			return sendError(errors.THE_ID_NOT_UNVERB, c)
+		}
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -283,6 +300,8 @@ func GetInByOrderNoByStatus() echo.HandlerFunc {
 			status = 1
 		} else if Status == "未通过" {
 			status = -1
+		} else if Status == "未审核" {
+			status = 0
 		}
 		//查询入库单是否存在
 		if OrderNo == "" {

@@ -7,6 +7,14 @@ import (
 	"unicode"
 )
 
+//订单类型
+const (
+	IN       = 1
+	OUT      = 2
+	PURCHASE = 3
+	PRODUCT  = 4
+)
+
 func sendError(restful *errors.Restful, c echo.Context) error {
 	return c.JSONPretty(http.StatusOK, restful, "      ")
 }
