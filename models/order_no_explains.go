@@ -94,3 +94,10 @@ func GetAllOrder() ([]OrderNoExplains, error) {
 	err := engine.Find(&orders)
 	return orders, err
 }
+
+//获取某种类型的所有订单
+func GetOrderByType(orderType int64) ([]OrderNoExplains, error) {
+	orders := make([]OrderNoExplains, 0)
+	err := engine.Where("order_type = ?", orderType).Find(&orders)
+	return orders, err
+}

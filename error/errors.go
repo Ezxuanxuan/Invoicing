@@ -40,9 +40,10 @@ var (
 
 	INVENTORY_SHORTAGE = &Restful{-1024, "数量超出，库存不足"}
 
-	ID_ERROR          = &Restful{-1025, "id错误"}
-	PUCHASE_NOT_EXIST = &Restful{-1026, "该采购单不存在"}
-	ID_NOT_EXIST      = &Restful{-1028, "id不存在"}
-	THE_ID_NOT_UNVERB = &Restful{-1029, "该条订单记录不是未审核状态"}
-	STOCK_NOT_ENOUGH  = &Restful{-1030, "库存不足"}
+	ID_ERROR             = &Restful{-1025, "id错误"}
+	PUCHASE_NOT_EXIST    = &Restful{-1026, "该采购单不存在"}
+	ID_NOT_EXIST         = &Restful{-1028, "id不存在"}
+	THE_ID_NOT_UNVERB    = &Restful{-1029, "该条订单记录不是未审核状态"}
+	STOCK_NOT_ENOUGH     = &Restful{-1030, "库存不足"}
+	ORDER_TYPE_NOT_EXIST = &Restful{-1031, "订单类型不存在"}
 )

@@ -52,6 +52,7 @@ func Init() (e *echo.Echo) {
 		v1.POST("/out/get/order/status", api.GetOutByOrderNoByStatus())
 
 		v1.POST("/order/get/all", api.GetAllOrder())
+		v1.POST("/order/get/type", api.GetOrderByType())
 	}
 	return
 }
