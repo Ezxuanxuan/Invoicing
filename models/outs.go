@@ -178,13 +178,15 @@ type ComponentOuts struct {
 //查询某给单号下的所有零件，包含零件信息
 func GetOutByOrderNo(order_no string) ([]ComponentOuts, error) {
 	outs := make([]ComponentOuts, 0)
-	err := engine.Table("outs").Join("INNER", "components", "components.id = outs.component_id").Where("order_no = ?", order_no).Find(&outs)
+	err := engine.Table("outs").Join("INNER", "components",
+		"components.id = outs.component_id").Where("order_no = ?", order_no).Find(&outs)
 	return outs, err
 }
 
 func GetOutByOrderNoByStatus(order_no string, status int64) ([]ComponentOuts, error) {
 	outs := make([]ComponentOuts, 0)
-	err := engine.Table("outs").Join("INNER", "components", "components.id = outs.component_id").Where("order_no = ? and status = ?", order_no, status).Find(&outs)
+	err := engine.Table("outs").Join("INNER", "components",
+		"components.id = outs.component_id").Where("order_no = ? and status = ?", order_no, status).Find(&outs)
 	return outs, err
 }
 

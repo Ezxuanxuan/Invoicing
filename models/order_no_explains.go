@@ -75,6 +75,7 @@ func CreateAllOrder(no string, tag string) (err error) {
 		session.Rollback()
 		return
 	}
+	session.Commit()
 	return
 }
 
@@ -85,4 +86,11 @@ func CreateOrderSession(No string, Type int64, Tag string, session *xorm.Session
 	order.OrderType = Type
 	order.Tag = Tag
 	return session.Insert(&order)
+}
+
+//获取所有订单信息
+func GetAllOrder() ([]OrderNoExplains, error) {
+	orders := make([]OrderNoExplains, 0)
+	err := engine.Find(&orders)
+	return orders, err
 }

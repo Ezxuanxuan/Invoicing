@@ -50,6 +50,8 @@ func Init() (e *echo.Echo) {
 		v1.POST("/out/update/quantity/id", api.UpdateOutQuantityById())
 		v1.POST("/out/get/order", api.GetOutByOrderNo())
 		v1.POST("/out/get/order/status", api.GetOutByOrderNoByStatus())
+
+		v1.POST("/order/get/all", api.GetAllOrder())
 	}
 	return
 }

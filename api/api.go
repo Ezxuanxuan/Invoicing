@@ -13,6 +13,9 @@ const (
 	OUT      = 2
 	PURCHASE = 3
 	PRODUCT  = 4
+	QUALITY  = 5
+	DESTROY  = 6
+	CARRY    = 7
 )
 
 func sendError(restful *errors.Restful, c echo.Context) error {
