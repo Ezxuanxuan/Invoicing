@@ -18,6 +18,7 @@ func Init() (e *echo.Echo) {
 		v1.POST("/staff/all", api.GetAllStaff())
 		v1.POST("/staff/update/password", api.ModifyPassword())
 		v1.POST("/staff/update/telephone", api.UpdateTelephone())
+		v1.POST("/staff/del", api.DelStaffById())
 
 		v1.POST("/permission/create", api.CreatePermission())
 		v1.POST("/permission/update", api.UpdatePermission())

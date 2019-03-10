@@ -131,3 +131,26 @@ func UpdateTelephone(id int64, telephone string) (int64, error) {
 	affected, err := engine.Id(id).Cols("telephone").Update(staff)
 	return affected, err
 }
+
+//删除员工
+func DelStaffById(id int64) (bool, error) {
+	staff := new(Staffs)
+	session := engine.NewSession()
+	err := session.Begin()
+	defer session.Close()
+	_, err = session.Where("id = ?", id).Delete(staff)
+	if err != nil {
+		session.Rollback()
+		return false, err
+	}
+	perimission := new(Permissions)
+	_, err = session.Where("staff_id = ?", id).Delete(perimission)
+	if err != nil {
+		session.Rollback()
+		return false, err
+	}
+	if err = session.Commit(); err != nil {
+		return false, err
+	}
+	return true, nil
+}

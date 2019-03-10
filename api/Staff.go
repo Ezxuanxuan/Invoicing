@@ -6,6 +6,7 @@ import (
 	"github.com/Invoicing/error"
 	"github.com/Invoicing/models"
 	"github.com/labstack/echo"
+	"strconv"
 	"time"
 )
 
@@ -207,5 +208,21 @@ func UpdateTelephone() echo.HandlerFunc {
 			return sendError(errors.DO_ERROR, c)
 		}
 		return sendSuccess(1, "", "更新电话号码成功", c)
+	}
+}
+
+func DelStaffById() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		UserId := c.FormValue("id")
+		userId, err := strconv.ParseInt(UserId, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+		_, err = models.DelStaffById(userId)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+
+		return sendSuccess(1, "", "删除成功", c)
 	}
 }
