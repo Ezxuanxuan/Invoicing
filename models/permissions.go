@@ -10,7 +10,7 @@ type Permissions struct {
 	UpdatedAt time.Time `xorm:"updated"`
 	DeletedAt time.Time `xorm:"index TIMESTAMP"`
 	StaffId   int64     `xorm:"INT(11)"`
-	Context   string    `xorm:"CHAR(11)"` //LogPer,InOrderPer,OutOrderPer,PermissionPer,WarePer,ProductPer,DestroyPer,QualityPer,CarryPer,InWarePer,SalePer
+	Context   string    `xorm:"CHAR(11) default '00000000000'"` //LogPer,InOrderPer,OutOrderPer,PermissionPer,WarePer,ProductPer,DestroyPer,QualityPer,CarryPer,InWarePer,SalePer
 }
 
 //创建员工权限
