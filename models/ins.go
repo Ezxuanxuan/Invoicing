@@ -7,13 +7,13 @@ import (
 )
 
 type Ins struct {
-	Id          int64     `xorm:"not null pk autoincr INT(11)" json:"id"`
+	Id          int64     `xorm:"not null pk autoincr INT(11)" json:"in_id"`
 	CreatedAt   time.Time `xorm:"created"`
 	UpdatedAt   time.Time `xorm:"updated"`
 	DeletedAt   time.Time `xorm:"index TIMESTAMP"`
 	OrderNo     string    `xorm:"VARCHAR(30)"`
 	ComponentId int64     `xorm:"INT(11)" json:"component_id"`
-	Quantity    int64     `xorm:"INT(11)"`
+	Quantity    int64     `xorm:"INT(11)" json:"in_quantity"`
 	Status      int64     `xorm:"INT(11)"`
 }
 

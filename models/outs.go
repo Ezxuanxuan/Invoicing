@@ -6,13 +6,13 @@ import (
 )
 
 type Outs struct {
-	Id          int64     `xorm:"not null pk autoincr INT(11)" json:"id"`
+	Id          int64     `xorm:"not null pk autoincr INT(11)" json:"out_id"`
 	CreatedAt   time.Time `xorm:"created"`
 	UpdatedAt   time.Time `xorm:"updated"`
 	DeletedAt   time.Time `xorm:"index TIMESTAMP"`
 	OrderNo     string    `xorm:"VARCHAR(30)"`
 	ComponentId int64     `xorm:"INT(11)"  json:"component_id"`
-	Quantity    int64     `xorm:"INT(11)"`
+	Quantity    int64     `xorm:"INT(11)" json:"out_quantity"`
 	Status      int64     `xorm:"INT(11)"`
 }
 
@@ -31,6 +31,7 @@ func InsertOutComponet(order_no string, component_id int64, quantity int64, stat
 		if err != nil {
 			return 0, err
 		}
+		return 1, nil
 	}
 	out := new(Outs)
 	out.OrderNo = order_no
