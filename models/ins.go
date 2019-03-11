@@ -32,6 +32,7 @@ func InsertInComponet(order_no string, component_id int64, quantity int64, statu
 		if err != nil {
 			return 0, err
 		}
+		return 1, nil
 	}
 	in := new(Ins)
 	in.OrderNo = order_no
