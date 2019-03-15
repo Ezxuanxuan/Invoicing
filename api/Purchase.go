@@ -143,10 +143,10 @@ func InsertPurchase() echo.HandlerFunc {
 }
 
 //修改采购单零件数量，通过采购单id
-func UpdatePurchase() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		Id := c.FormValue("id")
-		Count := c.FormValue("count")
-
-	}
-}
+//func UpdatePurchase() echo.HandlerFunc {
+//	return func(c echo.Context) error {
+//		Id := c.FormValue("id")
+//		Count := c.FormValue("count")
+//
+//	}
+//}
