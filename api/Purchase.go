@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+//获取某条采购信息，通过id
 func GetPurchaseById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		Id := c.FormValue("id")
@@ -34,6 +35,7 @@ func GetPurchaseById() echo.HandlerFunc {
 	}
 }
 
+//通过订单获取某条采购信息
 func GetPurchasesByOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		orderId := c.FormValue("order_id")
@@ -55,17 +57,18 @@ func GetPurchasesByOrder() echo.HandlerFunc {
 	}
 }
 
+//创建采购单
 func CreatePurchaseOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ordeNo := c.FormValue("no")
+		orderNo := c.FormValue("no")
 		orderTag := c.FormValue("tag")
 		//查询输入是否非法
-		if ordeNo == "" || orderTag == "" {
+		if orderNo == "" || orderTag == "" {
 			return sendError(errors.INPUT_ERROR, c)
 		}
 
 		//查询该订单编号是否存在
-		has, err := models.IsExistOrderNo(ordeNo, PURCHASE)
+		has, err := models.IsExistOrderNo(orderNo, PURCHASE)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		} //已存在
@@ -73,7 +76,7 @@ func CreatePurchaseOrder() echo.HandlerFunc {
 			return sendError(errors.ORDER_EXIST, c)
 		}
 
-		err = models.CreateAllOrder(ordeNo, orderTag)
+		err = models.CreateAllOrder(orderNo, orderTag)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}
@@ -81,14 +84,69 @@ func CreatePurchaseOrder() echo.HandlerFunc {
 	}
 }
 
-//func ChangePurchaseById() echo.HandlerFunc {
-//	return func(c echo.Context) error {
-//		id := c.FormValue("id")
-//
-//		Id, err := strconv.ParseInt(id, 10, 64)
-//		if err != nil {
-//			return sendError(errors.INPUT_ERROR, c)
-//		}
-//
-//	}
-//}
+//修改某采购单状态，通过id
+func ChangePurchaseById() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		Id := c.FormValue("id")
+		Count := c.FormValue("count")
+		id, err := strconv.ParseInt(Id, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+		count, err := strconv.ParseInt(Count, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+
+		has, ok, err := models.ChangePurchase2Pro(id, count)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if !has {
+			return sendError(errors.ID_NOT_EXIST, c)
+		}
+		if !ok {
+			return sendError(errors.COUNT_BEYOND, c)
+		}
+
+		return sendSuccess(1, "", "更改状态成功", c)
+	}
+}
+
+//向采购单插入零件
+func InsertPurchase() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		orderNo := c.FormValue("order_no")
+		componentId := c.FormValue("component_id")
+		Count := c.FormValue("count")
+
+		//查询输入是否非法
+		if orderNo == "" {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+		count, err := strconv.ParseInt(Count, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+		component_id, err := strconv.ParseInt(componentId, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+
+		_, err = models.InsertPuechaseComponet(orderNo, component_id, count)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+
+		return sendSuccess(1, "", "添加零件成功", c)
+	}
+}
+
+//修改采购单零件数量，通过采购单id
+func UpdatePurchase() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		Id := c.FormValue("id")
+		Count := c.FormValue("count")
+
+	}
+}

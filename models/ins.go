@@ -45,7 +45,6 @@ func InsertInComponet(order_no string, component_id int64, quantity int64, statu
 
 //插入多个新零件
 func InsertInComponents(order_no string, component_ids []int64, quantity int64, status int64) (int64, error) {
-	ins := make([]*Ins, 1)
 	session := engine.NewSession()
 	err1 := session.Begin()
 	if err1 != nil {
@@ -68,22 +67,22 @@ func InsertInComponents(order_no string, component_ids []int64, quantity int64, 
 				return 0, err
 			}
 		} else {
-			ins[i] = new(Ins)
-			ins[i].OrderNo = order_no
-			ins[i].ComponentId = component_ids[i]
-			ins[i].Quantity = quantity
-			ins[i].Status = status
+			in.Quantity = quantity
+			in.OrderNo = order_no
+			in.Status = status
+			_, err2 := session.InsertOne(in)
+			if err2 != nil {
+				session.Rollback()
+				return 0, err2
+			}
 		}
 	}
-	affected, err2 := session.Insert(ins)
-	if err2 != nil {
-		session.Rollback()
-		return 0, err2
-	}
+
 	if err3 := session.Commit(); err3 != nil {
+		session.Rollback()
 		return 0, err3
 	}
-	return affected, err2
+	return 1, nil
 }
 
 //更新某条记录的审核状态

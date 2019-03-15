@@ -46,4 +46,5 @@ var (
 	THE_ID_NOT_UNVERB    = &Restful{-1029, "该条订单记录不是未审核状态"}
 	STOCK_NOT_ENOUGH     = &Restful{-1030, "库存不足"}
 	ORDER_TYPE_NOT_EXIST = &Restful{-1031, "订单类型不存在"}
+	COUNT_BEYOND         = &Restful{-1032, "数量益处"}
 )
