@@ -24,7 +24,7 @@ func InsertOutComponet(order_no string, component_id int64, quantity int64, stat
 	if err != nil {
 		return 0, err
 	}
-	//如果该入库单中已经存在该id
+	//如果该c出库单中已经存在该id
 	if has {
 		out2.Quantity = quantity + out2.Quantity
 		_, err := engine.Update(out2)
@@ -211,4 +211,27 @@ func GetOutQuantityById(id int64) (int64, error) {
 	out := new(Outs)
 	_, err := engine.Id(id).Get(out)
 	return out.Quantity, err
+}
+
+func ToInsertOutComponet(order_no string, component_id int64, quantity int64) (int64, error) {
+	out := new(Outs)
+	//查看该零件是否已存在
+	has, err := engine.Where("order_no = ? and component_id = ?", order_no, component_id).Get(out)
+	if err != nil {
+		return 0, err
+	}
+	//如果该出库单中已经存在该零件id
+	if has {
+		out.Quantity = quantity + out.Quantity
+		_, err := engine.Update(out)
+		if err != nil {
+			return 0, err
+		}
+		return 1, nil
+	}
+	out2 := new(Outs)
+	out2.OrderNo = order_no
+	out2.ComponentId = component_id
+	out2.Quantity = quantity
+	return engine.InsertOne(out2)
 }

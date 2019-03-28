@@ -25,7 +25,7 @@ func InsertInComponet(order_no string, component_id int64, quantity int64, statu
 	if err != nil {
 		return 0, err
 	}
-	//如果该入库单中已经存在该id
+	//如果该入库单中已经存在该零件d
 	if has {
 		in2.Quantity = quantity + in2.Quantity
 		_, err := engine.Update(in2)
@@ -226,4 +226,27 @@ func GetInQuantityById(id int64) (int64, error) {
 func IsExistInId(id int64) (bool, error) {
 	in := new(Ins)
 	return engine.Where("id = ?", id).Exist(in)
+}
+
+func ToInsertInComponet(order_no string, component_id int64, quantity int64) (int64, error) {
+	in := new(Ins)
+	//查看该零件是否已存在
+	has, err := engine.Where("order_no = ? and component_id = ?", order_no, component_id).Get(in)
+	if err != nil {
+		return 0, err
+	}
+	//如果该出库单中已经存在该零件id
+	if has {
+		in.Quantity = quantity + in.Quantity
+		_, err := engine.Update(in)
+		if err != nil {
+			return 0, err
+		}
+		return 1, nil
+	}
+	in2 := new(Ins)
+	in2.OrderNo = order_no
+	in2.ComponentId = component_id
+	in2.Quantity = quantity
+	return engine.InsertOne(in2)
 }

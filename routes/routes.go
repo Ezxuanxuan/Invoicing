@@ -54,6 +54,29 @@ func Init() (e *echo.Echo) {
 
 		v1.POST("/order/get/all", api.GetAllOrder())
 		v1.POST("/order/get/type", api.GetOrderByType())
+
+		v1.POST("/purchase/get/id", api.GetPurchaseById())
+		v1.POST("/purchase/get/order", api.GetPurchasesByOrder())
+		v1.POST("/purchase/create", api.CreatePurchaseOrder())
+		v1.POST("/purchase/change2pro", api.ChangePurchase2ProById())
+		v1.POST("/purchase/insert", api.InsertPurchase())
+		v1.POST("/purchase/update", api.UpdatePurchase())
+		v1.POST("/purchase/change2out", api.ChangePurchase2OutById())
+
+		v1.POST("/product/get/order", api.GetProByOrder())
+		v1.POST("/product/create", api.CreateProOrder())
+		v1.POST("/product/pro2qu", api.ChangePro2Qu())
+		v1.POST("/product/insert", api.InsertPro())
+
+		v1.POST("/quality/get/order", api.GetQuByOrder())
+		v1.POST("/quality/qu2car", api.ChangeQu2Car())
+		v1.POST("/quality/qu2des", api.ChangeQu2Des())
+
+		v1.POST("/destroy/get/order", api.GetDesByOrder())
+
+		v1.POST("/carry/get/order", api.GetCarByOrder())
+		v1.POST("/carry/qu2car", api.ChangeCar2In())
+		v1.POST("/carry/qu2des", api.ChangeCar2Out())
 	}
 	return
 }

@@ -79,13 +79,54 @@ func CreateAllOrder(no string, tag string) (err error) {
 	return
 }
 
+//连续创建流程单,采购和出库除外
+func CreateProOrder(no string, tag string) (err error) {
+	err = nil
+	//创建事务
+	session := engine.NewSession()
+	defer session.Close()
+
+	//新建投产单
+	_, err = CreateOrderSession(no, PRODUCT, tag, session)
+	if err != nil {
+		session.Rollback()
+		return
+	}
+	//新建质检单
+	_, err = CreateOrderSession(no, QUALITY, tag, session)
+	if err != nil {
+		session.Rollback()
+		return
+	}
+	//新建销毁单
+	_, err = CreateOrderSession(no, DESTROY, tag, session)
+	if err != nil {
+		session.Rollback()
+		return
+	}
+	//新建完成单
+	_, err = CreateOrderSession(no, CARRY, tag, session)
+	if err != nil {
+		session.Rollback()
+		return
+	}
+	//新建入库单
+	_, err = CreateOrderSession(no, IN, tag, session)
+	if err != nil {
+		session.Rollback()
+		return
+	}
+	session.Commit()
+	return
+}
+
 //创建某单，以及备注
 func CreateOrderSession(No string, Type int64, Tag string, session *xorm.Session) (int64, error) {
 	order := new(OrderNoExplains)
 	order.OrderNo = No
 	order.OrderType = Type
 	order.Tag = Tag
-	return session.Insert(&order)
+	return session.Insert(order)
 }
 
 //获取所有订单信息

@@ -38,19 +38,16 @@ func GetPurchaseById() echo.HandlerFunc {
 //通过订单获取某条采购信息
 func GetPurchasesByOrder() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		orderId := c.FormValue("order_id")
+		orderId := c.FormValue("order_no")
 
 		orderid, err := strconv.ParseInt(orderId, 10, 64)
 		if err != nil {
 			return sendError(errors.ID_ERROR, c)
 		}
 
-		purchases, has, err := models.GetPurchasesByOrder(orderid)
+		purchases, err := models.GetPurchasesByOrder(orderid)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
-		}
-		if !has {
-			return sendError(errors.Order_NOT_EXIST, c)
 		}
 
 		return sendSuccess(1, purchases, "以上为该单号的所有采购信息", c)
@@ -85,7 +82,7 @@ func CreatePurchaseOrder() echo.HandlerFunc {
 }
 
 //修改某采购单状态，通过id
-func ChangePurchaseById() echo.HandlerFunc {
+func ChangePurchase2ProById() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		Id := c.FormValue("id")
 		Count := c.FormValue("count")
@@ -143,10 +140,57 @@ func InsertPurchase() echo.HandlerFunc {
 }
 
 //修改采购单零件数量，通过采购单id
-//func UpdatePurchase() echo.HandlerFunc {
-//	return func(c echo.Context) error {
-//		Id := c.FormValue("id")
-//		Count := c.FormValue("count")
-//
-//	}
-//}
+func UpdatePurchase() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		Id := c.FormValue("id")
+		Count := c.FormValue("count")
+		id, err := strconv.ParseInt(Id, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+		count, err := strconv.ParseInt(Count, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+
+		has, err := models.UpdatePurchase(id, count)
+
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if !has {
+			return sendError(errors.COUNT_BEYOND, c)
+		}
+
+		return sendSuccess(1, "", "添加数量成功", c)
+	}
+}
+
+//修改某采购单状态至出库单，通过id
+func ChangePurchase2OutById() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		Id := c.FormValue("id")
+		Count := c.FormValue("count")
+		id, err := strconv.ParseInt(Id, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+		count, err := strconv.ParseInt(Count, 10, 64)
+		if err != nil {
+			return sendError(errors.INPUT_ERROR, c)
+		}
+
+		has, ok, err := models.ChangePurchase2Out(id, count)
+		if err != nil {
+			return sendError(errors.DO_ERROR, c)
+		}
+		if !has {
+			return sendError(errors.ID_NOT_EXIST, c)
+		}
+		if !ok {
+			return sendError(errors.COUNT_BEYOND, c)
+		}
+
+		return sendSuccess(1, "", "更改状态成功", c)
+	}
+}
