@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/Invoicing/tools"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 )
@@ -16,13 +17,17 @@ const (
 	CARRY    = 7
 )
 
+var conf *tools.Conf
+
 var (
 	engine *xorm.Engine
 	err    error
 )
 
-func Init() {
-	engine, err = xorm.NewEngine("mysql", "root:@(127.0.0.1:3306)/Invoicing?charset=utf8")
+func Init(confPath string) {
+	conf = tools.GetConf(confPath)
+	engine, err = xorm.NewEngine("mysql", fmt.Sprintf(("%s:%s@(%s)/%s?charset=utf8"),
+		conf.User, conf.Password, conf.Host, conf.Dbname))
 	if err != nil {
 		fmt.Println(err)
 		panic("连接数据库失败")

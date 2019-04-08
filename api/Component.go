@@ -13,7 +13,7 @@ import (
 
 func CreateComponent() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		No := c.FormValue("no")
+		No := c.FormValue("")
 		Name := c.FormValue("name")
 		Material := c.FormValue("material")
 		Quality := c.FormValue("quality")

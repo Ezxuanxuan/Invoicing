@@ -118,7 +118,7 @@ func GetPermissionById() echo.HandlerFunc {
 			return sendError(errors.INPUT_ERROR, c)
 		}
 
-		context, err := models.GetPermissionById(id)
+		context, err := models.GetPermissionByStaff(id)
 		if err != nil {
 			return sendError(errors.DO_ERROR, c)
 		}

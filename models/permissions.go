@@ -59,5 +59,6 @@ func GetPermissions() ([]Permissions, error) {
 }
 
 func IsExistPermissionByStaffId(staff_id int64) (bool, error) {
-	return engine.Where("staff_id = ?", staff_id).Exist()
+	permission := new(Permissions)
+	return engine.Where("staff_id = ?", staff_id).Exist(permission)
 }

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"time"
 )
@@ -106,6 +107,7 @@ func CreateUser(staff Staffs) (bool, error) {
 func GetAllStaff() ([]Staffs, error) {
 	staffs := make([]Staffs, 0)
 	err := engine.Find(&staffs)
+	fmt.Println(err)
 	return staffs, err
 }
 
