@@ -28,26 +28,26 @@ func GetCarByOrder(order_no int64) ([]ComponentDes, error) {
 }
 
 func ToInsertCarComponet(order_no string, component_id int64, quantity int64) (int64, error) {
-	quality := new(Qualities)
+	carry := new(Carries)
 	//查看该零件是否已存在
-	has, err := engine.Where("order_no = ? and component_id = ?", order_no, component_id).Get(quality)
+	has, err := engine.Where("order_no = ? and component_id = ?", order_no, component_id).Get(carry)
 	if err != nil {
 		return 0, err
 	}
 	//如果该生产单中已经存在该零件id
 	if has {
-		quality.Quantity = quantity + quality.Quantity
-		_, err := engine.Update(quality)
+		carry.Quantity = quantity + carry.Quantity
+		_, err := engine.Update(carry)
 		if err != nil {
 			return 0, err
 		}
 		return 1, nil
 	}
-	quality2 := new(Qualities)
-	quality2.OrderNo = order_no
-	quality2.ComponentId = component_id
-	quality2.Quantity = quantity
-	return engine.InsertOne(quality2)
+	carry2 := new(Carries)
+	carry2.OrderNo = order_no
+	carry2.ComponentId = component_id
+	carry2.Quantity = quantity
+	return engine.InsertOne(carry2)
 }
 
 func ChangeCar2Out(id int64, count int64) (bool, bool, error) {
