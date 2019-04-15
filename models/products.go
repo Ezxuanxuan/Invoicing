@@ -22,7 +22,7 @@ type ComponentPro struct {
 
 func GetProByOrder(order_no int64) ([]ComponentPro, error) {
 	componentPro := make([]ComponentPro, 0)
-	err := engine.Table("purchases").Join("INNER", "components",
+	err := engine.Table("products").Join("INNER", "components",
 		"components.id = products.component_id").Where("order_no = ?", order_no).Find(&componentPro)
 	return componentPro, err
 }

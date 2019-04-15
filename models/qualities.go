@@ -22,7 +22,7 @@ type ComponentQu struct {
 
 func GetQuByOrder(order_no int64) ([]ComponentQu, error) {
 	componentQus := make([]ComponentQu, 0)
-	err := engine.Table("purchases").Join("INNER", "components",
+	err := engine.Table("qualities").Join("INNER", "components",
 		"components.id = qualities.component_id").Where("order_no = ?", order_no).Find(&componentQus)
 	return componentQus, err
 }

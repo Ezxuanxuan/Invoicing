@@ -22,7 +22,7 @@ type ComponentDes struct {
 
 func GetDesByOrder(order_no int64) ([]ComponentDes, error) {
 	componentDes := make([]ComponentDes, 0)
-	err := engine.Table("purchases").Join("INNER", "components",
+	err := engine.Table("destroys").Join("INNER", "components",
 		"components.id = destroys.component_id").Where("order_no = ?", order_no).Find(&componentDes)
 	return componentDes, err
 }
