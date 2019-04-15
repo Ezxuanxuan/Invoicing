@@ -10,7 +10,7 @@ type Products struct {
 	UpdatedAt    time.Time `xorm:"TIMESTAMP"`
 	DeletedAt    time.Time `xorm:"index TIMESTAMP"`
 	ComponentId  int64     `xorm:"INT(11)"  json:"component_id"`
-	Quantity     int64     `xorm:"INT(11)"`
+	Quantity     int64     `xorm:"INT(11)" json:"product_quantity"`
 	DeliveryDate time.Time `xorm:"TIMESTAMP"`
 	OrderNo      string    `xorm:"VARCHAR(30)"`
 }
